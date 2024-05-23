@@ -1,24 +1,16 @@
-from models.data import users
-from utils.crud import show_users
+import requests
+from bs4 import BeautifulSoup
 
-class User:
-    def __init__(self,name,surname,posts,location):
-        self.name=name
-        self.surname=surname
-        self.posts=posts
-        self.location=location
+def get_cordinates(miejscowosc:str)->list[float,float]:
+    url:str = f"https://pl.wikipedia.org/wiki/{miejscowosc}"
+    response = requests.get(url)
+    response_html = BeautifulSoup(response.text,'html.parser')
+    latitude = float(response_html.select(".latitude")[1].text.replace(",","."))
+    longitude = float(response_html.select(".longitude")[1].text.replace(",","."))
+    return [latitude,longitude]
 
-user_1=User(name="<Kewin>",surname="<Czajkowski>",posts=10,location="Gdynia")
-user_2=User(name="<Tomek>",surname="<Borowiecki>",posts=3,location="Warszawa")
-print(user_2.name)
 
-def update_user(users)-> None:
-    kogo_szukasz=input("Kogo szukasz?: ")
-    for user in users:
-        if  user['name']==kogo_szukasz:
-            user['name']=input("Podaj nowe imię: ")
-            user['surname']=input("Podaj nowe nazwisko: ")
-            user['liczba_postów']=input("Podaj liczbę postów: ")
-print(users)
-update_user(users)
-print(users)
+
+miejscowosc = input("Podaj nazwę miejscowosci: ")
+
+print(get_cordinates(miejscowosc))

@@ -1,5 +1,6 @@
 from tkinter import *
-
+import requests
+from bs4 import BeautifulSoup
 import tkintermapview
 
 users:list=[]
@@ -11,7 +12,16 @@ class User:
         self.surname = surname
         self.posts = posts
         self.location = location
+        self.cords=self.get_cordinates()
+        self.marker = map_widget.set_marker(self.cords[0], self.cords[1], text=f"{self.location}")
 
+    def get_cordinates(self):
+        url: str = f"https://pl.wikipedia.org/wiki/{self.location}"
+        response = requests.get(url)
+        response_html = BeautifulSoup(response.text, 'html.parser')
+        latitude = float(response_html.select(".latitude")[1].text.replace(",", "."))
+        longitude = float(response_html.select(".longitude")[1].text.replace(",", "."))
+        return [latitude, longitude]
 
 def add_new_user():
     user = User(name=entry_name.get(), surname=entry_surname.get(), posts=entry_posts.get(), location=entry_location.get())
@@ -32,6 +42,7 @@ def display_users():
 def delete_user():
 
     print(listbox_lista_uzytkownikow.index(ACTIVE))
+    users[listbox_lista_uzytkownikow.index(ACTIVE)].marker.delete()
     users.pop(listbox_lista_uzytkownikow.index(ACTIVE))
     display_users()
 
@@ -66,7 +77,7 @@ def update_user(i):
     entry_name.focus()
 
 root=Tk()
-root.geometry('800x700')
+root.geometry('1000x700')
 root.title('MapBook')
 
 # ramki do porządkowania struktury
@@ -140,8 +151,8 @@ label_opis_location_uzytkownika.grid(row=1, column=7)
 label_opis_location_uzytkownika_wartosc.grid(row=1, column=8)
 
 
-map_widget=tkintermapview.TkinterMapView(ramka_szczegoly_uzytkownika,width=700,height=300)
-map_widget.grid(row=2, column=0, columnspan=8)
+map_widget=tkintermapview.TkinterMapView(ramka_szczegoly_uzytkownika,width=800,height=300)
+map_widget.grid(row=2, column=0, columnspan=9)
 map_widget.set_position(52.21,21.00)
 map_widget.set_zoom(10)
 
