@@ -1,6 +1,4 @@
 import psycopg2
-import requests
-from bs4 import BeautifulSoup
 
 db_params = psycopg2.connect(
     database="postgres",
@@ -17,18 +15,11 @@ def add_new_to_table(db_params) -> None:
     post = input('Post: ')
     miejscowosc = input('Miejscowosc: ')
 
-    url: str = f"https://pl.wikipedia.org/wiki/{miejscowosc}"
-    response = requests.get(url)
-    response_html = BeautifulSoup(response.text, 'html.parser')
-    latitude = float(response_html.select(".latitude")[1].text.replace(",", "."))
-    longitude = float(response_html.select(".longitude")[1].text.replace(",", "."))
-    # return [latitude, longitude]
-    sql_add_query = f"INSERT INTO public.users(name, surname, post, location, coords)VALUES ('{imie}', '{nazwisko}', '{post}', '{miejscowosc}', 'SRID=4326;POINT({longitude} {latitude})');"
+    sql_add_query = f"INSERT INTO public.users(name, surname, post, location, cords)VALUES ('{imie}', '{nazwisko}', '{post}', '{miejscowosc}', 'SRID=4326;POINT(21.0 52.23)');"
     cursor = db_params.cursor()
     cursor.execute(sql_add_query)
     db_params.commit()
 
-add_new_to_table(db_params)
 
 def show_users(db_params) -> None:
     sql_add_query = f"SELECT * FROM public.users"
@@ -53,5 +44,4 @@ def update_users(db_params) -> None:
     db_params.commit()
 
 
-# update_users(db_params)
-
+update_users(db_params)
