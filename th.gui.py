@@ -7,7 +7,8 @@ users: list = []
 
 
 class User:
-    def __init__(self, name, surname, posts, location):
+    def __init__(self, id, name, surname, posts, location):
+        self.id
         self.name: str = name
         self.surname: str = surname
         self.posts: int = posts
